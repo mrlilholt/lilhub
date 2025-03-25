@@ -7,6 +7,7 @@ import WeatherCard from './components/Weather/WeatherCard';
 import DinnerCard from './components/Dinner/DinnerCard';
 import EventsCard from './components/Events/EventsCard';
 import TasksCard from './components/Tasks/TasksCard';
+import StarRewards from './components/StarRewards/StarRewards';  // Import the new component
 import { auth } from './firebase';
 import './styles/styles.css';
 
@@ -81,6 +82,11 @@ const App = () => {
           <div className="card">
             <TasksCard />
           </div>
+        </div>
+
+        {/* StarRewards card below TasksCard */}
+        <div className="dashboard-rewards" style={{ marginTop: '20px' }}>
+          <StarRewards />
         </div>
       </div>
     </div>
