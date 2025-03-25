@@ -2,14 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { db } from '../../firebase';
-<<<<<<< HEAD
 import { collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { FaTrashAlt, FaStar } from 'react-icons/fa'; // Import the trash and star icons from react-icons
 import '../../styles/TasksCard.css';
-=======
-import { collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc } from 'firebase/firestore';
-import { FaTrashAlt, FaStar } from 'react-icons/fa'; // Import the trash and star icons from react-icons
->>>>>>> 8ac596d (Updated TasksCard component functionality)
 
 const TasksCard = () => {
   const [title, setTitle] = useState('');
@@ -18,40 +13,17 @@ const TasksCard = () => {
   const [category, setCategory] = useState('');
   const [difficulty, setDifficulty] = useState(1);
   const [assignedTo, setAssignedTo] = useState('');
-<<<<<<< HEAD
   const [repeatDaily, setRepeatDaily] = useState(false); // New state for repeat option
-=======
->>>>>>> 8ac596d (Updated TasksCard component functionality)
   const [tasks, setTasks] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [detailedModalOpen, setDetailedModalOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState(null);
   const [completedTasks, setCompletedTasks] = useState({});
   const [points, setPoints] = useState({});
-<<<<<<< HEAD
   const [repeatConfirmOpen, setRepeatConfirmOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
 
   const familyMembers = ['Mira', 'Shea', 'Daddy', 'Mommy'];
-
-  useEffect(() => {
-    const resetPoints = () => {
-      const now = new Date();
-      const dayOfWeek = now.getDay();
-      const daysUntilMonday = (1 + 7 - dayOfWeek) % 7;
-      const nextMonday = new Date(now);
-      nextMonday.setDate(now.getDate() + daysUntilMonday);
-      nextMonday.setHours(0, 0, 0, 0);
-
-      const timeUntilNextMonday = nextMonday - now;
-      setTimeout(() => {
-        setPoints({});
-        resetPoints();
-      }, timeUntilNextMonday);
-    };
-
-    resetPoints();
-  }, []);
 
   useEffect(() => {
     const loadPoints = async () => {
@@ -72,11 +44,6 @@ const TasksCard = () => {
     loadPoints();
   }, []);
 
-=======
-
-  const familyMembers = ['Mira', 'Shea', 'Daddy', 'Mommy'];
-
->>>>>>> 8ac596d (Updated TasksCard component functionality)
   const openModalFor = (member) => {
     setAssignedTo(member);
     setModalOpen(true);
@@ -90,10 +57,7 @@ const TasksCard = () => {
     setCategory('');
     setDifficulty(1);
     setAssignedTo('');
-<<<<<<< HEAD
     setRepeatDaily(false); // Reset repeat flag
-=======
->>>>>>> 8ac596d (Updated TasksCard component functionality)
   };
 
   const openDetailedModalFor = (member) => {
@@ -118,10 +82,7 @@ const TasksCard = () => {
         category: category || null,
         difficulty: difficulty ? Number(difficulty) : null,
         assignedTo,
-<<<<<<< HEAD
         repeatDaily, // Store the repeat flag
-=======
->>>>>>> 8ac596d (Updated TasksCard component functionality)
         createdAt: new Date()
       });
       closeModal();
@@ -144,7 +105,6 @@ const TasksCard = () => {
 
   const handleDelete = async (taskId) => {
     try {
-<<<<<<< HEAD
       const taskDoc = tasks.find(t => t.id === taskId);
       if (taskDoc.repeatDaily) {
         // Instead of using window.confirm, open a custom confirm modal.
@@ -153,15 +113,11 @@ const TasksCard = () => {
       } else {
         await deleteDoc(doc(db, 'tasks', taskId));
       }
-=======
-      await deleteDoc(doc(db, 'tasks', taskId));
->>>>>>> 8ac596d (Updated TasksCard component functionality)
     } catch (error) {
       console.error('Error deleting task:', error);
     }
   };
 
-<<<<<<< HEAD
   // Called when user clicks "Keep" (meaning: keep the repeat, delete current instance and schedule tomorrow)
   const handleConfirmKeep = async () => {
     try {
@@ -241,25 +197,6 @@ const TasksCard = () => {
       ...prevPoints,
       [member]: 0
     }));
-=======
-  const handleTaskCheckbox = (taskId, member) => {
-    setCompletedTasks((prev) => {
-      const newCompletedTasks = { ...prev, [taskId]: !prev[taskId] };
-      const task = tasks.find(t => t.id === taskId);
-      if (newCompletedTasks[taskId]) {
-        setPoints((prevPoints) => ({
-          ...prevPoints,
-          [member]: (prevPoints[member] || 0) + (task.difficulty || 0)
-        }));
-      } else {
-        setPoints((prevPoints) => ({
-          ...prevPoints,
-          [member]: (prevPoints[member] || 0) - (task.difficulty || 0)
-        }));
-      }
-      return newCompletedTasks;
-    });
->>>>>>> 8ac596d (Updated TasksCard component functionality)
   };
 
   const tasksByMember = {};
@@ -282,12 +219,8 @@ const TasksCard = () => {
         ))}
       </div>
 
-<<<<<<< HEAD
       {/* Removed inline styles so that the CSS file can control layout */}
       <div className="tasks-grid">
-=======
-      <div className="tasks-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }}>
->>>>>>> 8ac596d (Updated TasksCard component functionality)
         {familyMembers.map(member => (
           <div key={`grid-${member}`} className="member-tasks" style={{ border: '1px solid #ccc', padding: '10px', borderRadius: '8px' }}>
             <h4 style={{ textAlign: 'center', marginBottom: '10px' }}>
@@ -326,7 +259,6 @@ const TasksCard = () => {
             <button onClick={() => openDetailedModalFor(member)} style={{ marginTop: '10px', display: 'block', width: '100%' }}>
               Detailed List
             </button>
-<<<<<<< HEAD
             {/* Reset Points button now at the bottom of each card */}
             <button onClick={() => resetPointsForMember(member)} style={{ marginTop: '10px', display: 'block', width: '100%' }}>
               Reset Points
@@ -395,12 +327,6 @@ const TasksCard = () => {
       )}
 
       {/* Modal for Adding Task (if needed) */}
-=======
-          </div>
-        ))}
-      </div>
-
->>>>>>> 8ac596d (Updated TasksCard component functionality)
       {modalOpen && (
         <div
           className="modal-overlay"
@@ -466,7 +392,6 @@ const TasksCard = () => {
                   </select>
                 </label>
               </div>
-<<<<<<< HEAD
               <div>
                 <label>
                   <input 
@@ -477,8 +402,6 @@ const TasksCard = () => {
                   Repeat Task Daily
                 </label>
               </div>
-=======
->>>>>>> 8ac596d (Updated TasksCard component functionality)
               <button type="submit">Add Task</button>
               <button type="button" onClick={closeModal}>Cancel</button>
             </form>
@@ -486,12 +409,8 @@ const TasksCard = () => {
         </div>
       )}
 
-<<<<<<< HEAD
       {/* Custom Confirmation Modal for repeating tasks */}
       {repeatConfirmOpen && selectedTask && (
-=======
-      {detailedModalOpen && selectedMember && (
->>>>>>> 8ac596d (Updated TasksCard component functionality)
         <div
           className="modal-overlay"
           style={{
@@ -500,17 +419,12 @@ const TasksCard = () => {
             left: 0,
             width: '100%',
             height: '100%',
-<<<<<<< HEAD
             backgroundColor: 'rgba(0,0,0,0.5)',
-=======
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
->>>>>>> 8ac596d (Updated TasksCard component functionality)
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center'
           }}
         >
-<<<<<<< HEAD
           <div
             className="modal-content"
             style={{
@@ -535,38 +449,6 @@ const TasksCard = () => {
           </div>
         </div>
       )}
-
-=======
-          <div className="modal-content" style={{ backgroundColor: 'white', padding: '20px', borderRadius: '4px', maxWidth: '600px', width: '100%' }}>
-            <h3>{selectedMember}'s Detailed Task List</h3>
-            <ul className="task-list" style={{ listStyle: 'none', padding: 0 }}>
-              {tasksByMember[selectedMember].length > 0 ? (
-                tasksByMember[selectedMember].map(task => (
-                  <li key={task.id} className="task-item" style={{ marginBottom: '10px', padding: '10px', borderRadius: '4px', backgroundColor: '#f9f9f9' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <div>
-                        <strong>{task.title}</strong>
-                        <div className="task-attributes" style={{ fontSize: '0.8em', color: '#555' }}>
-                          Due: {task.dueDate ? new Date(task.dueDate.seconds * 1000).toLocaleDateString() : 'N/A'}
-                          <br />
-                          Priority: {task.priority || 'N/A'} | Category: {task.category || 'N/A'} | Difficulty: {task.difficulty || 'N/A'}
-                        </div>
-                      </div>
-                      <button onClick={() => handleDelete(task.id)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
-                        <FaTrashAlt style={{ color: 'red' }} />
-                      </button>
-                    </div>
-                  </li>
-                ))
-              ) : (
-                <li style={{ textAlign: 'center', color: '#999' }}>No tasks assigned.</li>
-              )}
-            </ul>
-            <button onClick={closeDetailedModal} style={{ marginTop: '20px' }}>Close</button>
-          </div>
-        </div>
-      )}
->>>>>>> 8ac596d (Updated TasksCard component functionality)
     </div>
   );
 };
