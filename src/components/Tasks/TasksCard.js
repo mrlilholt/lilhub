@@ -7,6 +7,7 @@ import { FaTrashAlt, FaStar } from 'react-icons/fa'; // Import the trash and sta
 import '../../styles/TasksCard.css';
 
 const TasksCard = () => {
+  // ...existing state declarations...
   const [title, setTitle] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [priority, setPriority] = useState('Medium');
@@ -24,6 +25,13 @@ const TasksCard = () => {
   const [selectedTask, setSelectedTask] = useState(null);
 
   const familyMembers = ['Mira', 'Shea', 'Daddy', 'Mommy'];
+
+  const memberIcons = {
+    Mira: '/miraIcon.png',
+    Shea: '/sheaIcon.png',
+    Daddy: '/daddyIcon.png',
+    Mommy: '/mommyIcon.png'
+  };
 
   useEffect(() => {
     const loadPoints = async () => {
@@ -213,9 +221,16 @@ const TasksCard = () => {
       />
       <div className="add-task-buttons" style={{ display: 'flex', justifyContent: 'space-around', marginBottom: '20px' }}>
         {familyMembers.map(member => (
-          <button key={`btn-${member}`} onClick={() => openModalFor(member)}>
-            Add Task for {member}
-          </button>
+          <div key={`container-${member}`} style={{ display: 'flex', alignItems: 'center' }}>
+            <img 
+              src={memberIcons[member]} 
+              alt={`${member} Icon`} 
+              style={{ height: '30px', marginRight: '5px' }} // icon height updated here
+            />
+            <button onClick={() => openModalFor(member)}>
+              Add Task for {member}
+            </button>
+          </div>
         ))}
       </div>
 

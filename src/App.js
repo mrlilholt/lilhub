@@ -8,6 +8,7 @@ import DinnerCard from './components/Dinner/DinnerCard';
 import EventsCard from './components/Events/EventsCard';
 import TasksCard from './components/Tasks/TasksCard';
 import StarRewards from './components/StarRewards/StarRewards';  // Import the new component
+import TaskLeaderboard from './components/TaskLeaderboard/TaskLeaderboard';
 import { auth } from './firebase';
 import './styles/styles.css';
 
@@ -84,9 +85,14 @@ const App = () => {
           </div>
         </div>
 
-        {/* StarRewards card below TasksCard */}
-        <div className="dashboard-rewards" style={{ marginTop: '20px' }}>
-          <StarRewards />
+        {/* StarRewards and TaskLeaderboard side-by-side */}
+        <div className="dashboard-rewards" style={{ marginTop: '20px', display: 'flex', gap: '20px', justifyContent: 'center' }}>
+          <div style={{ flex: '0 0 40%' }}>
+            <StarRewards />
+          </div>
+          <div style={{ flex: '0 0 55%' }}>
+            <TaskLeaderboard />
+          </div>
         </div>
       </div>
     </div>
