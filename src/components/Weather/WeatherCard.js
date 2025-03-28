@@ -6,8 +6,6 @@ const WeatherCard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Default location; you can modify this or make it dynamic.
-  // const city = 'Langhorne'; // Commented out because it's not used
   // Make sure to set the correct API key in your environment variables
   const apiKey = process.env.REACT_APP_OPENWEATHER_API_KEY;
   const apiUrl = `https://api.openweathermap.org/data/2.5/weather?zip=19047,us&appid=${apiKey}&units=imperial`;
@@ -22,6 +20,7 @@ const WeatherCard = () => {
         }
         const data = await response.json();
         setWeather(data);
+        setError(null);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -29,7 +28,14 @@ const WeatherCard = () => {
       }
     };
 
+    // Initial fetch
     fetchWeather();
+
+    // Set up interval to update every hour (3600000ms)
+    const timerId = setInterval(fetchWeather, 3600000);
+
+    // Clear interval on component unmount
+    return () => clearInterval(timerId);
   }, [apiUrl]);
 
   const getWeatherIcon = (iconCode) => {

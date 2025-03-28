@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../../firebase';
-import { collection, addDoc, onSnapshot, query, orderBy } from 'firebase/firestore';
+import { collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc } from 'firebase/firestore';
+import { FaTrashAlt } from 'react-icons/fa'; // Import trashcan icon
 
 const EventsCard = () => {
   const [title, setTitle] = useState('');
@@ -22,20 +23,41 @@ const EventsCard = () => {
     setDescription('');
   };
 
+  // Helper function to convert "HH:mm" to AM/PM format
+  const formatTime = (timeStr) => {
+    if(!timeStr) return '';
+    const [hour, minute] = timeStr.split(':');
+    let hrs = parseInt(hour, 10);
+    const ampm = hrs >= 12 ? 'PM' : 'AM';
+    hrs = hrs % 12 || 12;
+    return `${hrs}:${minute} ${ampm}`;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!title || !date) return;
     try {
+      // Parse the date as local time
+      const [year, month, day] = date.split('-');
+      const localDate = new Date(year, month - 1, day);
       await addDoc(collection(db, 'events'), {
         title,
-        date: new Date(date), // store date as Date object
-        time: time || null,  // store time as string if provided, otherwise null
+        date: localDate, // use localDate instead of new Date(date)
+        time: time || null,
         description,
         createdAt: new Date()
       });
       closeModal();
     } catch (error) {
       console.error('Error adding event:', error);
+    }
+  };
+
+  const handleDeleteEvent = async (eventId) => {
+    try {
+      await deleteDoc(doc(db, 'events', eventId));
+    } catch (error) {
+      console.error('Error deleting event:', error);
     }
   };
 
@@ -63,13 +85,21 @@ const EventsCard = () => {
       </div>
       <ul className="event-list">
         {events.map((event) => {
-          const eventDate = new Date(event.date.seconds * 1000);
+          // Convert Firestore timestamp (if using seconds) to Date:
+          const eventDate = event.date.seconds ? new Date(event.date.seconds * 1000) : new Date(event.date);
+          const isPast = new Date() > eventDate;
           return (
-            <li key={event.id}>
-              <strong>{event.title}</strong> -{' '}
-              {eventDate.toLocaleDateString()}
-              {event.time && <span> at {event.time}</span>}
-              {event.description && <p>{event.description}</p>}
+            <li key={event.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div>
+                <strong>{event.title}</strong> - {eventDate.toLocaleDateString()}
+                {event.time && <span> at {formatTime(event.time)}</span>}
+                {event.description && <p>{event.description}</p>}
+              </div>
+              {isPast && (
+                <button onClick={() => handleDeleteEvent(event.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'red' }}>
+                  <FaTrashAlt />
+                </button>
+              )}
             </li>
           );
         })}

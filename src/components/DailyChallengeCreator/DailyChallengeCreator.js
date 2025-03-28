@@ -39,9 +39,6 @@ const DailyChallengeCreator = () => {
   const [date, setDate] = useState('');
   const [challenge, setChallenge] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const [showAllChallenges, setShowAllChallenges] = useState(false);
-  const [allChallenges, setAllChallenges] = useState([]);
-  // New edit modal state and form state for editing current challenge
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editFormState, setEditFormState] = useState({
     title: '',
@@ -64,20 +61,6 @@ const DailyChallengeCreator = () => {
       })
       .catch((err) => console.error('Error fetching daily challenge:', err));
   }, [date]);
-
-  const fetchAllChallenges = async () => {
-    try {
-      const querySnapshot = await getDocs(collection(db, 'dailyChallenges'));
-      const challengesArray = [];
-      querySnapshot.forEach((doc) => {
-        challengesArray.push({ id: doc.id, ...doc.data() });
-      });
-      setAllChallenges(challengesArray);
-      setShowAllChallenges(true);
-    } catch (error) {
-      console.error('Error fetching all challenges:', error);
-    }
-  };
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
@@ -119,7 +102,6 @@ const DailyChallengeCreator = () => {
     }
   };
 
-  // Accept challenge function remains unchanged:
   const handleAcceptChallenge = async (member) => {
     if (!challenge) return;
     try {
@@ -140,7 +122,6 @@ const DailyChallengeCreator = () => {
     }
   };
 
-  // Functions for editing the current challenge
   const openEditModal = () => {
     setEditFormState({
       title: challenge.title,
@@ -201,10 +182,9 @@ const DailyChallengeCreator = () => {
 
   return (
     <div style={{ marginTop: '40px', borderTop: '2px solid #ccc', paddingTop: '20px' }}>
-      {/* Buttons for creating and viewing all challenges */}
+      {/* Button for creating challenge only */}
       <button onClick={() => setModalOpen(true)}>Create Daily Challenge</button>
-      <button onClick={fetchAllChallenges} style={{ marginLeft: '10px' }}>Show All Daily Challenges</button>
-
+      
       {/* Modal for creating a new challenge */}
       {modalOpen && (
         <div className="modal-overlay" 
@@ -233,7 +213,7 @@ const DailyChallengeCreator = () => {
             <button onClick={() => setModalOpen(false)} style={{ float: 'right' }}>X</button>
             <h3>Create Daily Challenge</h3>
             <form onSubmit={handleCreateChallenge}>
-              {/* Form inputs ... */}
+              {/* ... form inputs ... */}
               <div style={{ marginBottom: '10px' }}>
                 <label>
                   Date (YYYY-MM-DD):
@@ -343,52 +323,7 @@ const DailyChallengeCreator = () => {
         </div>
       )}
 
-      {/* Modal to display all challenges */}
-      {showAllChallenges && (
-        <div className="modal-overlay" 
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            backgroundColor: 'rgba(0,0,0,0.5)',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            zIndex: 1100
-          }}
-        >
-          <div className="modal-content" 
-            style={{
-              backgroundColor: '#fff',
-              padding: '20px',
-              borderRadius: '4px',
-              maxWidth: '600px',
-              width: '90%',
-              maxHeight: '80vh',
-              overflowY: 'auto'
-            }}
-          >
-            <button onClick={() => setShowAllChallenges(false)} style={{ float: 'right' }}>X</button>
-            <h3>All Daily Challenges</h3>
-            {allChallenges.length > 0 ? (
-              allChallenges.map(chal => (
-                <div key={chal.id} style={{ borderBottom: '1px solid #ccc', padding: '10px 0' }}>
-                  <h4>{chal.title} - {chal.date}</h4>
-                  <p>{chal.description}</p>
-                  <p>Points: {chal.pointValue}</p>
-                  <p>Time Frame: {chal.startTime} - {chal.endTime}</p>
-                </div>
-              ))
-            ) : (
-              <p>No daily challenges found.</p>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Display the current challenge if exists and is not expired */}
+      {/* Display the current challenge if it exists and is not expired */}
       {challenge && !isChallengeExpired(challenge) && (
         <div
           style={{
