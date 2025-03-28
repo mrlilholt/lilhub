@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { doc, collection, getDoc, getDocs, setDoc, addDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, collection, getDoc, setDoc, addDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../firebase';
 
 // Define your family members and their icons
