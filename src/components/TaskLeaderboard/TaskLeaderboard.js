@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { collection, onSnapshot, query, doc, getDoc } from 'firebase/firestore';
+import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../../firebase';
 
 const familyMembers = [
@@ -10,50 +10,29 @@ const familyMembers = [
 ];
 
 const TaskLeaderboard = () => {
-  const [tasks, setTasks] = useState([]);
   const [points, setPoints] = useState({});
 
-  // Listen for realtime updates from the tasks collection
+  // Real-time listener for points
   useEffect(() => {
-    const q = query(collection(db, 'tasks'));
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const tasksData = [];
-      querySnapshot.forEach((doc) => {
-        tasksData.push({ id: doc.id, ...doc.data() });
-      });
-      setTasks(tasksData);
+    const scoresRef = doc(db, 'points', 'scores');
+    const unsubscribe = onSnapshot(scoresRef, (docSnap) => {
+      if (docSnap.exists()) {
+        setPoints(docSnap.data());
+      } else {
+        setPoints({});
+      }
     });
     return () => unsubscribe();
   }, []);
 
-  // Load points from Firestore
-  useEffect(() => {
-    const loadPoints = async () => {
-      try {
-        const scoresRef = doc(db, 'points', 'scores');
-        const scoresSnap = await getDoc(scoresRef);
-        if (scoresSnap.exists()) {
-          setPoints(scoresSnap.data());
-        }
-      } catch (error) {
-        console.error('Error loading scores:', error);
-      }
-    };
-    loadPoints();
-  }, []);
-
   const computeMetrics = (memberName) => {
-    // Use points state to compute total stars for a member
     const totalStars = points[memberName] || 0;
-    // Display stars as x:200 instead of 200 - x
     return { totalStars };
   };
 
-  // Calculate total family stars by summing over each member's stars
   const totalFamilyStars = familyMembers.reduce((sum, member) => {
     return sum + (points[member.name] || 0);
   }, 0);
-  // Compute progress percent for the family bar based on a goal of 200 stars
   const familyProgressPercent = Math.min((totalFamilyStars / 200) * 100, 100);
 
   return (
@@ -69,7 +48,6 @@ const TaskLeaderboard = () => {
             <div>
               <strong>{member.name}</strong>
               <div>Total Stars: {totalStars} : 200</div>
-              {/* Progress Bar placed directly after stars display */}
               <div style={{ width: '200px', height: '20px', backgroundColor: '#eee', borderRadius: '10px', overflow: 'hidden', marginTop: '5px' }}>
                 <div style={{ width: `${progressPercent}%`, height: '100%', backgroundColor: '#4caf50' }}></div>
               </div>
@@ -77,7 +55,6 @@ const TaskLeaderboard = () => {
           </div>
         );
       })}
-      {/* Total Family Stars Bar */}
       <div style={{ marginTop: '20px', paddingTop: '10px', borderTop: '2px solid #ccc' }}>
         <strong>Total Family Stars</strong>
         <div>Total: {totalFamilyStars} : 200</div>

@@ -7,8 +7,9 @@ import WeatherCard from './components/Weather/WeatherCard';
 import DinnerCard from './components/Dinner/DinnerCard';
 import EventsCard from './components/Events/EventsCard';
 import TasksCard from './components/Tasks/TasksCard';
-import StarRewards from './components/StarRewards/StarRewards';  // Import the new component
+import StarRewards from './components/StarRewards/StarRewards';
 import TaskLeaderboard from './components/TaskLeaderboard/TaskLeaderboard';
+import DailyChallengeCreator from './components/DailyChallengeCreator/DailyChallengeCreator';
 import { auth } from './firebase';
 import './styles/styles.css';
 
@@ -51,8 +52,9 @@ const App = () => {
           <button onClick={() => auth.signOut()}>Sign Out</button>
         </div>
       </header>
+
       <div className="dashboard">
-        {/* Row of cards for Clock, Weather, Dinner, and Events */}
+        {/* Top row: Clock, Weather, Dinner, Events */}
         <div
           className="dashboard-top"
           style={{ 
@@ -78,14 +80,19 @@ const App = () => {
           </div>
         </div>
 
-        {/* TasksCard on its own row */}
+        {/* Daily Challenge card placed here above family tasks */}
+        <div style={{ marginTop: '20px' }}>
+          <DailyChallengeCreator />
+        </div>
+
+        {/* Family Tasks */}
         <div className="dashboard-bottom" style={{ marginTop: '20px' }}>
           <div className="card">
             <TasksCard />
           </div>
         </div>
 
-        {/* StarRewards and TaskLeaderboard side-by-side */}
+        {/* Rewards and Leaderboard side-by-side */}
         <div className="dashboard-rewards" style={{ marginTop: '20px', display: 'flex', gap: '20px', justifyContent: 'center' }}>
           <div style={{ flex: '0 0 40%' }}>
             <StarRewards />

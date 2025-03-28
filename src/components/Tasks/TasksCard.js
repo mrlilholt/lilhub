@@ -52,6 +52,18 @@ const TasksCard = () => {
     loadPoints();
   }, []);
 
+  useEffect(() => {
+    const pointsRef = doc(db, 'points', 'scores');
+    const unsubscribe = onSnapshot(pointsRef, (docSnap) => {
+      if (docSnap.exists()) {
+        setPoints(docSnap.data());
+      } else {
+        setPoints({});
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
   const openModalFor = (member) => {
     setAssignedTo(member);
     setModalOpen(true);
@@ -174,24 +186,26 @@ const TasksCard = () => {
   const handleTaskCheckbox = async (taskId, member) => {
     const task = tasks.find(t => t.id === taskId);
     if (!task) return;
-    const difficultyVal = task.difficulty || 0;
     
-    // Determine if the task is being marked complete or undone.
+    // Determine whether the task is currently marked as completed
     const isCompleted = completedTasks[taskId];
-    // Toggle the checkbox state.
-    const newCompletedTasks = { ...completedTasks, [taskId]: !isCompleted };
-    setCompletedTasks(newCompletedTasks);
-  
-    // Calculate updated score.
+    // Toggle the completed state
+    const newCompleted = !isCompleted;
+    setCompletedTasks(prev => ({ ...prev, [taskId]: newCompleted }));
+    
+    // For daily challenge tasks, use the pointValue; for others, use the difficulty (or 0 if not set)
+    const pointsToUpdate = task.dailyChallenge ? (task.pointValue || 0) : (task.difficulty || 0);
+    
+    // Update the score only when the task is checked off (or unchecked, subtracting points)
     let updatedScore = points[member] || 0;
-    if (!isCompleted) {
-      updatedScore += difficultyVal;
+    if (newCompleted) {
+      updatedScore += pointsToUpdate;
     } else {
-      updatedScore -= difficultyVal;
+      updatedScore -= pointsToUpdate;
     }
     
     try {
-      // Update Firestore.
+      // Update Firestore with the new score.
       await updateDoc(doc(db, 'points', 'scores'), { [member]: updatedScore });
       // Update local state.
       setPoints(prev => ({ ...prev, [member]: updatedScore }));
@@ -200,11 +214,16 @@ const TasksCard = () => {
     }
   };
 
-  const resetPointsForMember = (member) => {
-    setPoints((prevPoints) => ({
-      ...prevPoints,
-      [member]: 0
-    }));
+  const resetPointsForMember = async (member) => {
+    try {
+      await updateDoc(doc(db, 'points', 'scores'), { [member]: 0 });
+      setPoints(prevPoints => ({
+        ...prevPoints,
+        [member]: 0
+      }));
+    } catch (error) {
+      console.error("Error resetting points for", member, error);
+    }
   };
 
   const tasksByMember = {};
