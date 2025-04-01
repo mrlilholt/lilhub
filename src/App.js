@@ -10,6 +10,7 @@ import TasksCard from './components/Tasks/TasksCard';
 import StarRewards from './components/StarRewards/StarRewards';
 import TaskLeaderboard from './components/TaskLeaderboard/TaskLeaderboard';
 import DailyChallengeCreator from './components/DailyChallengeCreator/DailyChallengeCreator';
+import MediaPlayer from './components/MediaPlayer/MediaPlayer';
 import { auth } from './firebase';
 import './styles/styles.css';
 
@@ -92,10 +93,11 @@ const App = () => {
           </div>
         </div>
 
-        {/* Rewards and Leaderboard side-by-side */}
+        {/* Rewards and Leaderboard side-by-side with MediaPlayer under StarRewards */}
         <div className="dashboard-rewards" style={{ marginTop: '20px', display: 'flex', gap: '20px', justifyContent: 'center' }}>
-          <div style={{ flex: '0 0 40%' }}>
+          <div style={{ flex: '0 0 40%', display: 'flex', flexDirection: 'column', gap: '20px' }}>
             <StarRewards />
+            <MediaPlayer />
           </div>
           <div style={{ flex: '0 0 55%' }}>
             <TaskLeaderboard />
