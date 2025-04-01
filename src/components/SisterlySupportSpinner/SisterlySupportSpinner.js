@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../firebase';
-import { FaSpinner, FaFemale } from 'react-icons/fa';
+import { FaSpinner } from 'react-icons/fa';
 
 const challenges = [
   {
@@ -123,11 +123,12 @@ const SisterlySupportSpinner = () => {
         maxWidth: '300px',
         margin: '20px auto'
       }}>
-        <h3>
-          <FaFemale style={{ marginRight: '8px' }}/>
-          <FaFemale style={{ marginRight: '8px' }}/>
-          Sisterly Support Challenges
-        </h3>
+        <img
+          src="/sisterlyIcon.png"
+          alt="Sisterly Icon"
+          style={{ width: '150px', marginBottom: '10px' }} // enlarged image
+        />
+        <h3>Sisterly Support Challenges</h3>
         <p>Spin the wheel to assign a sisterly challenge!</p>
         <button onClick={spin} disabled={spinning} style={{
           padding: '10px 20px',
