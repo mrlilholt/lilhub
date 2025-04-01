@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../firebase';
-import { FaSpinner } from 'react-icons/fa';
+import { FaSpinner, FaFemale } from 'react-icons/fa';
 
 const challenges = [
   {
@@ -83,7 +83,7 @@ const SisterlySupportSpinner = () => {
           description: selectedChallenge.rule,
           pointValue: selectedChallenge.points,
           assignedTo: sister,
-          dueDate: new Date(), // Added to help TasksCard order/display it
+          dueDate: new Date(), // Helps TasksCard order/display it
           createdAt: serverTimestamp(),
           sisterlySupport: true
         });
@@ -97,14 +97,19 @@ const SisterlySupportSpinner = () => {
 
   return (
     <>
-      {/* Inline style for spinner animation */}
+      {/* Inline style for spinner animation with Chromium-compatible prefixes */}
       <style>
         {`
+          @-webkit-keyframes spin {
+            from { -webkit-transform: rotate(0deg); }
+            to { -webkit-transform: rotate(360deg); }
+          }
           @keyframes spin {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
           }
           .spinner {
+            -webkit-animation: spin 1s linear infinite;
             animation: spin 1s linear infinite;
           }
         `}
@@ -118,7 +123,11 @@ const SisterlySupportSpinner = () => {
         maxWidth: '300px',
         margin: '20px auto'
       }}>
-        <h3>👯‍♀️ Sisterly Support Challenges</h3>
+        <h3>
+          <FaFemale style={{ marginRight: '8px' }}/>
+          <FaFemale style={{ marginRight: '8px' }}/>
+          Sisterly Support Challenges
+        </h3>
         <p>Spin the wheel to assign a sisterly challenge!</p>
         <button onClick={spin} disabled={spinning} style={{
           padding: '10px 20px',
