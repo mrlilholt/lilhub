@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../firebase';
-import { FaSpinner } from 'react-icons/fa';
+
+const colors = [
+  "#FF5733", "#F39C12", "#F1C40F", "#2ECC71", "#3498DB",
+  "#9B59B6", "#E74C3C", "#1ABC9C", "#E67E22", "#34495E"
+];
 
 const challenges = [
   {
@@ -57,20 +61,38 @@ const challenges = [
 ];
 
 const SisterlySupportSpinner = () => {
+  const [rotation, setRotation] = useState(0);
+  const [spinning, setSpinning] = useState(false);
   const [selectedChallenge, setSelectedChallenge] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
-  const [spinning, setSpinning] = useState(false);
 
-  const spin = () => {
+  const spinWheel = () => {
+    if (spinning) return;
     setSpinning(true);
-    // Simulate spinning delay (2 seconds)
-    setTimeout(() => {
-      const randomIndex = Math.floor(Math.random() * challenges.length);
-      const challenge = challenges[randomIndex];
-      setSelectedChallenge(challenge);
-      setShowPopup(true);
-      setSpinning(false);
-    }, 2000);
+    // Choose a random segment from 0 to 9
+    const segmentIndex = Math.floor(Math.random() * 10);
+    // Each segment spans 36°; take the center of the segment: segmentIndex*36 + 18
+    const targetAngle = segmentIndex * 36 + 18;
+    // Add several full rotations (e.g., 5 full spins = 1800°) plus adjustment
+    const extraRotations = 5 * 360;
+    // Calculate current rotation mod 360
+    const currentRemainder = rotation % 360;
+    // Determine additional angle needed to land on target
+    let delta = targetAngle - currentRemainder;
+    if (delta < 0) delta += 360;
+    const finalRotation = rotation + extraRotations + delta;
+    setRotation(finalRotation);
+  };
+
+  // Called when CSS transition ends
+  const onTransitionEnd = () => {
+    // Determine segment index from final rotation
+    const landingAngle = rotation % 360; // angle within [0,360)
+    let segIndex = Math.floor(landingAngle / 36);
+    // In our design, we assume segments are in order with challenges array
+    setSelectedChallenge(challenges[segIndex]);
+    setSpinning(false);
+    setShowPopup(true);
   };
 
   const handleAcceptChallenge = async () => {
@@ -95,89 +117,94 @@ const SisterlySupportSpinner = () => {
     }
   };
 
+  // Generate CSS conic gradient string for 10 segments using colors
+  const gradientString = `conic-gradient(${colors.map((c, i) => {
+    const startDeg = i * 36;
+    const endDeg = (i + 1) * 36;
+    return `${c} ${startDeg}deg ${endDeg}deg`;
+  }).join(', ')})`;
+
   return (
     <>
-      {/* Inline style for spinner animation with Chromium-compatible prefixes */}
       <style>
         {`
-          @-webkit-keyframes spin {
-            from { -webkit-transform: rotate(0deg); }
-            to { -webkit-transform: rotate(360deg); }
-          }
-          @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-          }
-          .spinner {
-            -webkit-animation: spin 1s linear infinite;
-            animation: spin 1s linear infinite;
+          .wheel {
+            transition: transform 4s cubic-bezier(0.33, 1, 0.68, 1);
           }
         `}
       </style>
-      <div style={{
-        background: '#fff',
-        padding: '20px',
-        borderRadius: '8px',
-        textAlign: 'center',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-        maxWidth: '300px',
-        margin: '20px auto'
-      }}>
-        <img
-          src="/sisterlyIcon.png"
-          alt="Sisterly Icon"
-          style={{ width: '150px', marginBottom: '10px' }} // enlarged image
-        />
-        <h3>Sisterly Support Challenges</h3>
-        <p>Spin the wheel to assign a sisterly challenge!</p>
-        <button onClick={spin} disabled={spinning} style={{
-          padding: '10px 20px',
-          fontSize: '16px',
-          cursor: spinning ? 'default' : 'pointer'
-        }}>
-          {spinning ? <FaSpinner className="spinner" size={24} /> : 'Spin'}
-        </button>
+      <div style={{ textAlign: 'center', margin: '20px' }}>
+        {/* Wrapper for the wheel with relative positioning */}
+        <div style={{ position: 'relative', width: '300px', height: '300px', margin: '0 auto' }}>
+          <div 
+            className="wheel"
+            onClick={spinWheel}
+            onTransitionEnd={onTransitionEnd}
+            style={{
+              width: '300px',
+              height: '300px',
+              borderRadius: '50%',
+              background: gradientString,
+              transform: `rotate(${rotation}deg)`,
+              cursor: spinning ? 'default' : 'pointer'
+            }}
+          />
+          {/* Centered icon */}
+          <img 
+            src="/sisterlyIconUpdate.png" 
+            alt="Sisterly Icon" 
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: '160px'
+            }}
+          />
+        </div>
+        <p style={{ marginTop: '10px' }}>Click the wheel to spin!</p>
+        <p>Accept the Sisterly Support Challenge if you want!</p>
+      </div>
 
-        {showPopup && selectedChallenge && (
+      {showPopup && selectedChallenge && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          background: 'rgba(0,0,0,0.5)'
+        }}>
           <div style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100vw',
-            height: '100vh',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            background: 'rgba(0,0,0,0.5)'
+            background: '#fff',
+            padding: '20px',
+            borderRadius: '8px',
+            textAlign: 'center',
+            maxWidth: '400px'
           }}>
-            <div style={{
-              background: '#fff',
-              padding: '20px',
-              borderRadius: '8px',
-              textAlign: 'center',
-              maxWidth: '400px'
-            }}>
-              <h3>{selectedChallenge.title}</h3>
-              <p>{selectedChallenge.rule}</p>
-              <p>Points: {selectedChallenge.points}</p>
-              <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginTop: '10px' }}>
-                <button onClick={handleAcceptChallenge} style={{
-                  padding: '8px 16px',
-                  cursor: 'pointer'
-                }}>
-                  Accept Challenge
-                </button>
-                <button onClick={() => setShowPopup(false)} style={{
-                  padding: '8px 16px',
-                  cursor: 'pointer'
-                }}>
-                  Close
-                </button>
-              </div>
+            <h3>{selectedChallenge.title}</h3>
+            <p>{selectedChallenge.rule}</p>
+            <p>Points: {selectedChallenge.points}</p>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginTop: '10px' }}>
+              <button onClick={handleAcceptChallenge} style={{
+                padding: '8px 16px',
+                cursor: 'pointer'
+              }}>
+                Accept Challenge
+              </button>
+              <button onClick={() => setShowPopup(false)} style={{
+                padding: '8px 16px',
+                cursor: 'pointer'
+              }}>
+                Close
+              </button>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </>
   );
 };
