@@ -41,6 +41,30 @@ const tracks = [
     title: 'Chill 9',
     url: 'https://res.cloudinary.com/dtvecsd0q/video/upload/v1739496721/Lofi_Beats_Mix_chill_lo-fi_hip_hop_beats_4_jvhske.mp3'
   },
+  {
+    title: 'Chill 10',
+    url: 'https://res.cloudinary.com/dtvecsd0q/video/upload/v1743689886/WORK_MUSIC_-_Ambient_Tunes_for_Focused_Energy_Productivity_4_att2pt.mp3'
+  },
+  {
+    title: 'Chill 11',
+    url: 'https://res.cloudinary.com/dtvecsd0q/video/upload/v1743692358/Peaceful_Sunrise_Piano_Guitar_for_Relaxation_4_uxy49x.mp3'
+  },
+  {
+    title: 'Chill 12',
+    url: 'https://res.cloudinary.com/dtvecsd0q/video/upload/v1743697560/Chill_Lofi_Beats_chill_lo-fi_hip_hop_beats_Lofi_Deep_Focus_Work_Study__Reading_4_mzmzts.mp3'
+  },
+  {
+    title: 'Chill 13',
+    url: 'https://res.cloudinary.com/dtvecsd0q/video/upload/v1743703901/Seaside_Lofi_in_a_Japanese_Cafe%CC%81_Relaxing_Lo_Fi_Beats_with_Ocean_Breeze_Ambience_Cozy_Lofi_Music_4_fcgfzb.mp3'
+  },
+  {
+    title: 'Spanish Guitar',
+    url: 'https://res.cloudinary.com/dtvecsd0q/video/upload/v1743707350/Estas_Tonne_-_Old_Style_Full_Album_4_toccic.mp3'
+  },
+  {
+    title: 'On The Road Again',
+    url: 'https://res.cloudinary.com/dtvecsd0q/video/upload/v1743705255/On_the_Road_Again_-_Groove_Monkey_-_4_jhb4a2.mp3'
+  },
 ];
 
 const MediaPlayer = () => {
