@@ -11,6 +11,87 @@ const memberIcons = {
   Mommy: '/mommyIcon.png'
 };
 
+// Prefill challenge options by day
+const prefillChallengeOptions = {
+  Monday: {
+    title: "Motivation Monday",
+    options: [
+      "Morning Mantra – Everyone says or writes a positive phrase to start the day.",
+      "Marvelous Message – Write/draw a kind note for someone in the family.",
+      "Mini Mission – Choose one thing to help someone else today without being asked.",
+      "Mindful Minute – Sit quietly and breathe together for 1 minute.",
+      "Motivator Moment – Cheer someone on during their task or challenge."
+    ]
+  },
+  Tuesday: {
+    title: "Tidy-Up Tuesday",
+    options: [
+      "Ten-Minute Tidy – Clean up any space together for 10 minutes (music helps!).",
+      "Toy/Treasure Tidy – Pick 3 toys or items to organize or donate.",
+      "Tabletop Task – Wipe down a table or surface as a team.",
+      "Tiny Trash Trot – Find and throw away or recycle 5 pieces of trash around the house.",
+      "Teamroom Transformation – Pick one room to all clean or reset together."
+    ]
+  },
+  Wednesday: {
+    title: "Wisdom Wednesday",
+    options: [
+      "Wonder Word – Learn and share a new word with the family.",
+      "What-If Question – Ask a fun “What if…” question and take turns answering.",
+      "Wise Walk – Go on a short walk and each point out something new.",
+      "Wacky Fact – Share a silly or surprising fact you learned.",
+      "World Explorer – Pick a place on the map/globe and learn one thing about it."
+    ]
+  },
+  Thursday: {
+    title: "Thoughtful Thursday",
+    options: [
+      "Thank-You Thursday – Make or say a thank-you to someone in or outside the house.",
+      "Thoughtful Art – Create a drawing or craft for a family member.",
+      "Three Cheers – Celebrate someone’s accomplishment big or small.",
+      "Tiny Treat Task – Help prepare or serve a snack or treat for someone else.",
+      "Together Time Token – Offer someone a “together time” card (play, read, help, etc.)."
+    ]
+  },
+  Friday: {
+    title: "Fitness Friday",
+    options: [
+      "Family Freeze Dance – Put on music and dance until it stops!",
+      "Fitness Find – Pick a room and invent an exercise using something in it.",
+      "Follow-the-Leader Fun – Take turns leading short silly movement routines.",
+      "Five-Minute Move – Everyone moves non-stop for 5 minutes (run, jump, crawl!).",
+      "Fitness Fort – Build a fort and do stretches or exercises inside."
+    ]
+  },
+  Saturday: {
+    title: "Strategy Saturday",
+    options: [
+      "Story Switcheroo – One person starts a story, others take turns adding to it.",
+      "Sort & Stack – Pick a bin or drawer and sort/organize it together.",
+      "Silly Scavenger – Create or follow a mini scavenger hunt indoors.",
+      "Smart Snack Plan – As a team, plan and prep one healthy snack.",
+      "Solve-It Saturday – Do a puzzle, game, or brainteaser together."
+    ]
+  },
+  Sunday: {
+    title: "Soulful Sunday",
+    options: [
+      "Sweet Memory Share – Each person shares a happy memory from the week.",
+      "Snuggle & Story – Read or make up a story together.",
+      "Soulful Stroll – Go on a mindful walk or explore outside quietly.",
+      "Silent Snuggle Space – Create a cozy spot and relax together (books, music, etc.).",
+      "Sunshine Shout-Out – Give someone a compliment or shout-out for being awesome."
+    ]
+  }
+};
+
+// Helper function to get day name from a date string (YYYY-MM-DD)
+const getDayName = (dateStr) => {
+  // Append T00:00:00 to force local midnight interpretation
+  const d = new Date(dateStr + "T00:00:00");
+  return d.toLocaleDateString('en-US', { weekday: 'long' });
+};
+
 // Helper function to format time to am/pm
 const formatTime = (timeStr) => {
   const [hour, minute] = timeStr.split(':');
@@ -47,6 +128,8 @@ const DailyChallengeCreator = () => {
     startTime: '',
     endTime: ''
   });
+  // New state for prefill selection
+  const [selectedPrefillOption, setSelectedPrefillOption] = useState('');
 
   useEffect(() => {
     if (!date) return;
@@ -69,6 +152,13 @@ const DailyChallengeCreator = () => {
 
   const handleDateChange = (e) => {
     setDate(e.target.value);
+    // When date changes, auto-set the prefill option to the first option for that day, if available.
+    const dayName = getDayName(e.target.value);
+    if (prefillChallengeOptions[dayName]) {
+      setSelectedPrefillOption(prefillChallengeOptions[dayName].options[0]);
+    } else {
+      setSelectedPrefillOption('');
+    }
   };
 
   const handleCreateChallenge = async (e) => {
@@ -180,12 +270,22 @@ const DailyChallengeCreator = () => {
     }
   };
 
+  // Function to prefill the form based on the selected date's day-of-week options
+  const prefillForm = () => {
+    const dayName = getDayName(date);
+    if (prefillChallengeOptions[dayName]) {
+      setFormState((prev) => ({
+        ...prev,
+        title: prefillChallengeOptions[dayName].title,
+        description: selectedPrefillOption
+      }));
+    }
+  };
+
   return (
     <div style={{ marginTop: '40px', borderTop: '2px solid #ccc', paddingTop: '20px' }}>
-      {/* Button for creating challenge only */}
       <button onClick={() => setModalOpen(true)}>Create Daily Challenge</button>
       
-      {/* Modal for creating a new challenge */}
       {modalOpen && (
         <div className="modal-overlay" 
           style={{
@@ -212,14 +312,29 @@ const DailyChallengeCreator = () => {
           >
             <button onClick={() => setModalOpen(false)} style={{ float: 'right' }}>X</button>
             <h3>Create Daily Challenge</h3>
-            <form onSubmit={handleCreateChallenge}>
-              {/* ... form inputs ... */}
+            <div style={{ marginBottom: '10px' }}>
+              <label>
+                Date (YYYY-MM-DD):
+                <input type="date" value={date} onChange={handleDateChange} required style={{ marginLeft: '10px' }}/>
+              </label>
+            </div>
+            {/* Prefill Section: Shown if a date is selected and there is a matching day */}
+            {date && prefillChallengeOptions[getDayName(date)] && (
               <div style={{ marginBottom: '10px' }}>
-                <label>
-                  Date (YYYY-MM-DD):
-                  <input type="date" value={date} onChange={handleDateChange} required style={{ marginLeft: '10px' }}/>
-                </label>
+                <h4>{prefillChallengeOptions[getDayName(date)].title} Prefill Options</h4>
+                <select 
+                  value={selectedPrefillOption} 
+                  onChange={e => setSelectedPrefillOption(e.target.value)} 
+                  style={{ marginLeft: '10px', width: '100%' }}
+                >
+                  {prefillChallengeOptions[getDayName(date)].options.map((option, idx) => (
+                    <option key={idx} value={option}>{option.split(' – ')[0]}</option>
+                  ))}
+                </select>
+                <button type="button" onClick={prefillForm} style={{ marginTop: '5px' }}>Prefill Challenge</button>
               </div>
+            )}
+            <form onSubmit={handleCreateChallenge}>
               <div style={{ marginBottom: '10px' }}>
                 <label>
                   Title:
@@ -256,7 +371,6 @@ const DailyChallengeCreator = () => {
         </div>
       )}
 
-      {/* Modal for editing the current challenge */}
       {editModalOpen && (
         <div className="modal-overlay" 
           style={{
@@ -323,7 +437,6 @@ const DailyChallengeCreator = () => {
         </div>
       )}
 
-      {/* Display the current challenge if it exists and is not expired */}
       {challenge && !isChallengeExpired(challenge) && (
         <div
           style={{
@@ -370,7 +483,6 @@ const DailyChallengeCreator = () => {
               </div>
             ))}
           </div>
-          {/* Edit button */}
           <button onClick={openEditModal} style={{ marginTop: '20px' }}>
             Edit Challenge
           </button>
